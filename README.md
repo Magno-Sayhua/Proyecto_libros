@@ -25,3 +25,5 @@ El sistema permite gestionar el inventario de libros y el registro de préstamos
   * Modificación de datos guardados.
   * Eliminación de registros.
 * **Validación de Datos:** Implementación de validaciones en backend (Java Servlets) y frontend (HTML5/Bootstrap) para prevenir errores de tipo de dato y campos vacíos.
+  
+**Nota:** Falta una pequeña actualización en las listas de actualizar, lo cual lo resolveré pronto.
