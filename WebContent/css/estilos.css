@@ -1,0 +1,122 @@
+@charset "ISO-8859-1";
+
+/*--------- CSS DE MENÚ ---------*/
+
+.body-oscuro {
+	background-image: url('../img/fondo_menu_7.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  	font-family: FuturaHandwritten;
+    
+    
+    background-color: #e9edc9;
+    text-align: center;
+    padding-top: 100px;
+}
+
+/*FONDO DE LISTADOS*/
+.body-claro{
+	background-image: url('../img/fondo_lista.png'); 
+	background-size: cover;
+	background-position: center;
+    background-attachment: fixed;
+  	font-family: FuturaHandwritten;
+	
+	background-color: #e9edc9;
+    text-align: center;
+    padding-top: 100px;
+}
+
+/*PA VOLVER Y NUEVO REGISTRO*/
+.uwu{
+	font-family: SimSun;
+	font-size: 16px;
+	font-weight: bold;
+	color: #8da9c4;
+}
+
+    /* H1*/
+.h1{
+    color: white;
+    font-family: FuturaHandwritten;
+    font-size: 60px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    
+    align: center;
+}
+
+
+/* BOTÓN DE ALMACÉN */
+.menu-btn{
+    display: block;
+    width: 220px;
+    margin: 15px auto;
+    padding: 12px;
+    background-color: #99582a;
+    font-weight: bold;
+    color: black;
+    border-radius: 6px;
+    font-size: 20px;
+}
+
+
+/*BOTÓN DE PRÉSTAMO*/
+.menu-btn-2{
+    display: block;
+    width: 220px;
+    margin: 15px auto;
+    padding: 12px;
+    background-color: #7f5539;
+    font-weight: bold;
+    color: black;
+    border-radius: 6px;
+    font-size: 20px;
+}
+
+/*--------- CSS DE REGISTRO (préstamo y almacén) ---------*/
+.table {
+	color: black; 
+	font-family: FuturaHandwritten; 
+	font-weight: bold;
+	font-size: 20px;
+}
+
+/* tabla */
+table{
+    border-collapse:collapse;
+    width:70%;
+    margin:auto;
+    background:#faedcd;
+}
+
+/* encabezados */
+th{
+    background:#c9ada7;
+    padding:10px;
+}
+
+/* celdas */
+td{
+    padding:8px;
+    text-align:center;
+    font-size:19px;
+}
+
+/* filas alternadas */
+tr:nth-child(even){
+    background:#ede0d4;
+}
+
+/* iconos */
+img{
+    width:20px;
+}
+
+
+
+
+
+
+
+    
