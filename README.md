@@ -1,6 +1,7 @@
 # Proyecto de Gestión de Almacén y Préstamo de Libros
 
 Aplicación Web monolítica desarrollada como parte de mi formación académica en **SENATI**.
+
 El sistema permite gestionar el inventario de libros y el registro de préstamos utilizando una arquitectura **MVC** y realizando operaciones **CRUD** completas.
 
 ---
