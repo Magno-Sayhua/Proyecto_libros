@@ -16,9 +16,26 @@
 <body class="body-oscuro">
 	<%
 		Almacen p = (Almacen) request.getAttribute("registro");
+		if (p == null) {
+			p = new Almacen();
+		}
 	%>
 
 	<h1 align="center">Actualizar Datos</h1>
+	
+	<%-- MUESTRA LA ALERTA DE ERROR SI EXISTE EL ATRIBUTO --%>
+	
+	<%
+		String msjErrorA = (String) request.getAttribute("mensajeErrorA");
+		if (msjErrorA != null){
+	%>		
+		<div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+				<strong><i class="fa fa-exclamation-triangle"></i> ¡Aviso!</strong> <%= msjErrorA %>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+	<%}%>
 	
 	
 	<div class="container">
@@ -37,52 +54,38 @@
 			<table border="1" align="center" class="table">
 				<tr>
 					<td>Títulos</td>
-					<td><input type="text" name="txt_tit"
-						value="<%=p.getTitulo()%>"></td>
+					<td><input type="text" name="txt_tit" value="<%= p.getTitulo() != null ? p.getTitulo() : "" %>" class="form-control" required></td>
 				</tr>
 				<tr>
 					<td>Autores</td>
-					<td><input type="text" name="txt_aut"
-						value="<%=p.getAutor()%>"></td>
+					<td><input type="text" name="txt_aut" value="<%= p.getAutor() != null ? p.getAutor() : "" %>" class="form-control" required></td>
 				</tr>
 				<tr>
 					<td>Fecha de Ingreso</td>
-					<td><input type="date" name="txt_fec"
-						value="<%=p.getFecha_ingreso()%>"></td>
+					<td><input type="date" name="txt_fec" value="<%= p.getFecha_ingreso() != null ? p.getFecha_ingreso(): "" %>" class="form-control" required></td>
 				</tr>
 				<tr>
 					<td>Stock</td>
-					<td><input type="text" name="txt_sto"
-						value="<%=p.getStock()%>"></td>
+					<td><input type="text" name="txt_sto" value="<%= p.getStock()%>" class="form-control" required></td>
 				</tr>
 				<!-- Todo lo que se ha hecho en categorías es un tipo de operación para que cuando se quiera actualizar, no se coloque automáticamente el "Seleccionar",
 				sino que se quede en la categoría que estuvo puesto -->
 				<tr>
 					<td>Categorías</td>
 					<td>
-					<select type="text" id="demo" name="txt_cat">
+					<select type="text" id="demo" name="txt_cat" class="form-control" required>
 					
-						<option value="" <%= p.getCategoria() == null ? "selected" : "" %>>Seleccionar</option>
+						<option value="">Seleccionar</option>
 
-						<option value="Novela Contemporánea"
-							<%= "Novela Contemporánea".equals(p.getCategoria()) ? "selected" : "" %>>
-							Novela Contemporánea</option>
+						<option value="Novela Contemporánea" <%= "Novela Contemporánea".equals(p.getCategoria()) ? "selected" : "" %>>Novela Contemporánea</option>
 
-						<option value="Poesía y Lírica"
-							<%= "Poesía y Lírica".equals(p.getCategoria()) ? "selected" : "" %>>
-							Poesía y Lírica</option>
+						<option value="Poesía y Lírica"<%= "Poesía y Lírica".equals(p.getCategoria()) ? "selected" : "" %>>Poesía y Lírica</option>
 
-						<option value="Relato Histórico"
-							<%= "Relato Histórico".equals(p.getCategoria()) ? "selected" : "" %>>
-							Relato Histórico</option>
+						<option value="Relato Histórico"<%= "Relato Histórico".equals(p.getCategoria()) ? "selected" : "" %>>Relato Histórico</option>
 
-						<option value="Ensayo y Crítica"
-							<%= "Ensayo y Crítica".equals(p.getCategoria()) ? "selected" : "" %>>
-							Ensayo y Crítica</option>
+						<option value="Ensayo y Crítica"<%= "Ensayo y Crítica".equals(p.getCategoria()) ? "selected" : "" %>>Ensayo y Crítica</option>
 
-						<option value="Literatura Indigenista"
-							<%= "Literatura Indigenista".equals(p.getCategoria()) ? "selected" : "" %>>
-							Literatura Indigenista</option>
+						<option value="Literatura Indigenista"<%= "Literatura Indigenista".equals(p.getCategoria()) ? "selected" : "" %>>Literatura Indigenista</option>
 					</select>
 					</td>
 				</tr>
