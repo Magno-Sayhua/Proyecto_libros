@@ -46,7 +46,7 @@ public class ServletAlmacen extends HttpServlet {
 	private void buscarcod(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    String dato = request.getParameter("cod1");
 
-	    // 1. Validar que no llegue vacío o solo espacios
+	    // Validar que no llegue vacío o solo espacios
 	    if (dato == null || dato.trim().isEmpty()) {
 	        request.setAttribute("mensajeError", "Por favor, ingrese un código de libro.");
 	        request.getRequestDispatcher("almacen-lista.jsp").forward(request, response);
@@ -54,13 +54,13 @@ public class ServletAlmacen extends HttpServlet {
 	    }
 
 	    try {
-	        // 2. Convertir a entero
+	        // Convertir a entero
 	        int codigo = Integer.parseInt(dato);
 
-	        // 3. Consultar la base de datos
+	        // Consultar la base de datos
 	        List<Almacen> info = new ModeloAlmacen().buscarAlmacenxcod(codigo);
 
-	        // 4. Validar si la lista está vacía (Libro no encontrado)
+	        // Validar si la lista está vacía (Libro no encontrado)
 	        if (info == null || info.isEmpty()) {
 	            request.setAttribute("mensajeError", "El código de libro " + codigo + " no existe en la lista.");
 	        } else {
@@ -87,27 +87,97 @@ public class ServletAlmacen extends HttpServlet {
 	}
 	
 	
-	//ACTUALIZAR
+	// ACTUALIZAR
 	private void actualizar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Almacen obj = new Almacen();
-		String cod = request.getParameter("txt_cod");
-		String tit = request.getParameter("txt_tit");
-		String aut = request.getParameter("txt_aut");
-		String fec = request.getParameter("txt_fec");
-		String sto = request.getParameter("txt_sto");
-		String cat = request.getParameter("txt_cat");
-		
-		obj.setCod_almacen(Integer.parseInt(cod));
-		obj.setTitulo(tit);
-		obj.setAutor(aut);
-		obj.setFecha_ingreso(LocalDate.parse(fec));
-		obj.setStock(Integer.parseInt(sto));
-		obj.setCategoria(cat);
-		int estado = m.actualizarAlmacen(obj);
-		if (estado != -1)
-			listar(request, response);
-		else
-			response.sendRedirect("error.html");		
+	    Almacen obj = new Almacen();
+	    String cod = request.getParameter("txt_cod");
+	    String tit = request.getParameter("txt_tit");
+	    String aut = request.getParameter("txt_aut");
+	    String fec = request.getParameter("txt_fec");
+	    String sto = request.getParameter("txt_sto");
+	    String cat = request.getParameter("txt_cat");
+
+	 // Asignar todo de inmediato al objeto
+	    if (cod != null && !cod.trim().isEmpty()) {
+	        try { obj.setCod_almacen(Integer.parseInt(cod)); 
+	        } catch (Exception e) {
+	        	}
+	    }
+	    obj.setTitulo(tit);
+	    obj.setAutor(aut);
+	    obj.setCategoria(cat);
+
+	    // Intentamos parsear la fecha si existe para guardarla en obj por si salta otro error
+	    if (fec != null && !fec.trim().isEmpty()) {
+	        try { obj.setFecha_ingreso(LocalDate.parse(fec)); 
+	        } catch (Exception e) {
+	        	}
+	    }
+
+	    // Validar campos vacíos
+	    if (tit == null || tit.trim().isEmpty() ||
+	        aut == null || aut.trim().isEmpty() ||
+	        fec == null || fec.trim().isEmpty() ||
+	        sto == null || sto.trim().isEmpty() ||
+	        cat == null || cat.trim().isEmpty() || cat.equals("Seleccionar")) {
+
+	        // Volvemos a armar los datos parciales para que la vista no reciba un objeto nulo
+	        obj.setTitulo(tit);
+	        obj.setAutor(aut);
+	        obj.setCategoria(cat);
+
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "Por favor, complete todos los campos obligatorios.");
+	        request.getRequestDispatcher("almacen-actualiza.jsp").forward(request, response);
+	        return;
+	    }
+
+	    LocalDate fechaIngreso = null;
+	    int stockCant = 0;
+
+	    // Validar fecha
+	    try {
+	        fechaIngreso = LocalDate.parse(fec);
+	        obj.setFecha_ingreso(fechaIngreso);
+	    } catch (Exception e) {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "La fecha ingresada es inválida.");
+	        request.getRequestDispatcher("almacen-actualiza.jsp").forward(request, response);
+	        return;
+	    }
+
+	    // Validar stock
+	    try {
+	        stockCant = Integer.parseInt(sto);
+	        obj.setStock(stockCant);
+	        if (stockCant < 0) {
+	            request.setAttribute("registro", obj);
+	            request.setAttribute("mensajeErrorA", "El stock no puede ser un número negativo.");
+	            request.getRequestDispatcher("almacen-actualiza.jsp").forward(request, response);
+	            return;
+	        }
+	    } catch (NumberFormatException e) {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "El campo Stock no permite letras ni caracteres especiales.");
+	        request.getRequestDispatcher("almacen-actualiza.jsp").forward(request, response);
+	        return;
+	    }
+
+	    // Si todo está correcto, actualizamos en BD
+	    obj.setTitulo(tit);
+	    obj.setAutor(aut);
+	    obj.setFecha_ingreso(fechaIngreso);
+	    obj.setStock(stockCant);
+	    obj.setCategoria(cat);
+
+	    int estado = m.actualizarAlmacen(obj);
+	    if (estado != -1) {
+	        listar(request, response);
+	    } else {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "Error de base de datos al intentar actualizar el libro.");
+	        request.getRequestDispatcher("almacen-actualiza.jsp").forward(request, response);
+	    }
 	}
 	
 	

@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import entidad.Almacen;
 import entidad.Prestamo;
+import modelo.ModeloAlmacen;
 import modelo.ModeloPrestamo;
 
 @WebServlet("/ServletPrestamo")
@@ -97,21 +99,107 @@ public class ServletPrestamo extends HttpServlet {
 		String fecd = request.getParameter("txt_fec_d");
 		String estado = request.getParameter("txt_estado");
 		
+		// Asignar todo de inmediato al objeto
+		if (cod != null && cod.trim().isEmpty()) {
+			try {
+				obj.setCod_prestamo(Integer.parseInt(cod));
+			} catch (Exception e) {
+				}
+		}
 			obj.setCod_libro(Integer.parseInt(cod_libro));
-			obj.setCod_prestamo(Integer.parseInt(cod));
 			obj.setNombre(nom);
 			obj.setApellido(ape);
-			obj.setFecha_prestamo(LocalDate.parse(fecp));
-			obj.setFecha_devolucion(LocalDate.parse(fecd));
 			obj.setEstado(estado);
+			
+		// Intentamos parsear si existe para guardarla en el obj por si salta otro error
+			if (fecp != null && !fecp.trim().isEmpty() && fecd != null && !fecd.trim().isEmpty()){
+					try {
+						obj.setFecha_prestamo(LocalDate.parse(fecp));
+						obj.setFecha_devolucion(LocalDate.parse(fecd));
+					} catch (Exception e) {
+					}
+				}
 		
+		// Validar que el campo no esté vacío
 		
-			int estado2 = m.actualizarPrestamo(obj);
-			if (estado2 != -1)
-				listar(request, response);
-			else
-				response.sendRedirect("error.html");
-	}
+		if (cod_libro == null || cod_libro.trim().isEmpty() ||
+				nom == null || nom.trim().isEmpty() ||
+				ape == null || ape.trim().isEmpty() ||
+			    fecp == null || fecp.trim().isEmpty() ||
+				fecd == null || fecd.trim().isEmpty() ||
+				estado == null || estado.trim().isEmpty() || estado.equals("Seleccionar")) {
+			
+				// Volvemos a armar los datos parciales para que la vista no reciba un objeto nulo
+				obj.setNombre(nom);
+				obj.setApellido(ape);
+				obj.setEstado(estado);
+			
+				request.setAttribute("mensajeErrorA", "Por favor, complete todos los campos obligatorios.");
+				request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+				return;
+		}
+		
+		// Validar formato de fechas
+		
+	    LocalDate fechaPre = null;
+	    LocalDate fechaDevo = null;
+	    try {
+	        fechaPre = LocalDate.parse(fecp);
+	        fechaDevo = LocalDate.parse(fecd);
+
+	        obj.setFecha_prestamo(fechaPre);
+	        obj.setFecha_devolucion(fechaDevo);
+
+	        // Validar que la fecha de devolución no sea anterior a la de préstamo
+	        if (fechaDevo.isBefore(fechaPre)) {
+	            request.setAttribute("registro", obj);
+	            request.setAttribute("mensajeErrorA", "La fecha de devolución no puede ser anterior a la fecha de préstamo.");
+	            request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+	            return;
+	        }
+
+	    } catch (Exception e) {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "Formato de fecha inválido.");
+	        request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+	        return;
+	    }
+		
+		// Validar que el Código de Libro sea un número y EXISTAN datos en la tabla Almacén
+	    
+	    int codigoLibroInt = 0;
+	    try {
+	        codigoLibroInt = Integer.parseInt(cod_libro);
+	        obj.setCod_libro(codigoLibroInt);
+
+	        // Consultamos en la BD usando ModeloAlmacen para ver si existe el libro
+	        Almacen libroEncontrado = new ModeloAlmacen().buscarAlmacen(codigoLibroInt);
+
+	        if (libroEncontrado == null) {
+	            request.setAttribute("registro", obj);
+	            request.setAttribute("mensajeErrorA", "El Código de Libro '" + codigoLibroInt + "' no existe en el almacén.");
+	            request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+	            return;
+	        }
+
+	    } catch (NumberFormatException e) {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "El Código de Libro debe ser un número entero válido.");
+	        request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+	        return;
+	    }
+	    
+	 // Si todo está correcto, actualizamos en la BD
+	    int resultado = new ModeloPrestamo().actualizarPrestamo(obj);
+
+	    if (resultado != -1) {
+	        listar(request, response);
+	    } else {
+	        request.setAttribute("registro", obj);
+	        request.setAttribute("mensajeErrorA", "Error al intentar actualizar el préstamo en la base de datos.");
+	        request.getRequestDispatcher("prestamo-actualiza.jsp").forward(request, response);
+	    	}
+		}
 
 	
 	//REGISTRAR
@@ -145,15 +233,23 @@ public class ServletPrestamo extends HttpServlet {
 		
 		try {
 			fechaPrestamo = LocalDate.parse(fecp);
+			fechaDevolucion = LocalDate.parse(fecd);	
+			
+			obj.setFecha_prestamo(fechaPrestamo);
+			obj.setFecha_devolucion(fechaDevolucion);
+			
+			// Validar que la fecha de devolución no sea anterior a la de préstamo
+			if (fechaDevolucion.isBefore(fechaPrestamo)) {
+				request.setAttribute("mensajeErrorP", "La fecha de devolución no puede ser anterior a la fecha de préstamo.");
+				request.getRequestDispatcher("prestamo-registra.jsp").forward(request, response);
+				return;
+			}
+			
 		} catch (Exception e) {
-			request.setAttribute("mensajeErrorP", "La fecha ingresada es inválida. No se permiten letras (Formato: YYYY-MM-DD).");
+			request.setAttribute("mensajeErrorP", obj);
+			request.setAttribute("mensajeErrorP", "Formato de fecha inválido.");
 			request.getRequestDispatcher("prestamo-registra.jsp").forward(request, response);
-		}
-		
-		try {
-			fechaDevolucion = LocalDate.parse(fecd);
-		} catch (Exception e) {
-			request.setAttribute("mensajeErrorP", "La fecha ingresada es inválida. No se permiten letras (Formato: YYYY-MM-DD).");
+			return;
 		}
 		
 		// 3. Validar código de libro (solo números enteros)

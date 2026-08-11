@@ -17,7 +17,23 @@
 
 	<%
 		Prestamo p = (Prestamo) request.getAttribute("registro");
+		if (p == null){
+			p = new Prestamo();
+		}
 	%>
+	
+	<%-- Alerta de error --%>
+<% 
+    String msjErrorA = (String) request.getAttribute("mensajeErrorA");
+    if (msjErrorA != null) { 
+%>
+    <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+        <strong>¡Aviso!</strong> <%= msjErrorA %>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<% } %>
 
 <h1 align="center">Actualizar Datos</h1>
 	<br>
@@ -38,38 +54,38 @@
 				<!-- COD DE LIBRO -->
 					<tr>
 						<td>Código de Libro</td>
-						<td><input type="text" name="txt_cod_libro" value="<%=p.getCod_libro()%>"></td>
+						<td><input type="text" name="txt_cod_libro" value="<%= p.getCod_libro() != 0 ? p.getCod_libro() : "" %>" class="form-control" required></td>
 					</tr>
 
 					<!-- NOMBRE -->
 					<tr>
 						<td>Nombre de Usuario</td>
-						<td><input type="text" name="txt_nom" value="<%=p.getNombre()%>"></td>
+						<td><input type="text" name="txt_nom" value="<%=p.getNombre() != null ? p.getNombre() : ""%>" class="form-control" required></td>
 					</tr>
 
 					<!-- APELLIDO -->
 					<tr>
 						<td>Apellido de Usuario</td>
-						<td><input type="text" name="txt_ape" value="<%=p.getApellido()%>"></td>
+						<td><input type="text" name="txt_ape" value="<%=p.getApellido() != null ? p.getApellido() : ""%>" class="form-control" required></td>
 					</tr>
 
 					<!-- FECHA DE PRESTAMO -->
 					<tr>
 						<td>Fecha de Préstamo</td>
-						<td><input type="date" name="txt_fec_p" value="<%=p.getFecha_prestamo()%>"></td>
+						<td><input type="date" name="txt_fec_p" value="<%=p.getFecha_prestamo() != null ? p.getFecha_prestamo() : ""%>" class="form-control" required></td>
 					</tr>
 
 					<!-- FECHA DE DEVOLUCIÓN -->
 					<tr>
 						<td>Fecha de Devolución</td>
-						<td><input type="date" name="txt_fec_d" value="<%=p.getFecha_devolucion()%>"></td>
+						<td><input type="date" name="txt_fec_d" value="<%=p.getFecha_devolucion() != null ? p.getFecha_devolucion() : ""%>" class="form-control" required></td>
 					</tr>
 
 
 				<!--ESTADOS -->
 				<tr>
 					<td>Estado</td>
-					<td><select name="txt_estado">
+					<td><select name="txt_estado" class="form-control">
 							<option value="" <%= p.getEstado() == null ? "selected" : "" %>>Seleccionar</option>
 							<option value="Activo"
 								<%= "Activo".equals(p.getEstado()) ? "selected" : "" %>>
